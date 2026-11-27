@@ -26,6 +26,9 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -43,15 +46,19 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 /**
  * Main window: plan management, period and limit parameters, accounts, entries,
@@ -76,6 +83,11 @@ final class MainView extends BorderPane {
     private final TableView<Account> accountTable = new TableView<>(accounts);
     private final TableView<Entry> entryTable = new TableView<>(entries);
     private final TableView<SimulationRow> previewTable = new TableView<>();
+    private final NumberAxis trendMonths = new NumberAxis();
+    private final NumberAxis trendMoney = new NumberAxis();
+    private final LineChart<Number, Number> trendChart = new LineChart<>(trendMonths, trendMoney);
+    private final ToggleButton tableView = new ToggleButton("Tabelle");
+    private final ToggleButton chartView = new ToggleButton("Trenddiagramm");
     private final Label capital = new Label();
     private final Label banner = new Label();
     private final Label summary = new Label();
@@ -239,13 +251,52 @@ final class MainView extends BorderPane {
         previewTable.getColumns().setAll(List.of(date, what, amount, balance));
         previewTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         previewTable.getStyleClass().add("preview-table");
-        VBox.setVgrow(previewTable, Priority.ALWAYS);
+        trendChart.setCreateSymbols(false);
+        trendChart.setAnimated(false);
+        trendChart.setAxisSortingPolicy(LineChart.SortingPolicy.NONE);
+        trendChart.getStyleClass().add("trend-chart");
+        trendMonths.setAutoRanging(false);
+        trendMonths.setMinorTickVisible(false);
+        trendMonths.setLabel("Monat");
+        trendMoney.setForceZeroInRange(false);
+        trendMoney.setLabel("Gesamtsumme");
+        trendMoney.setTickLabelFormatter(new StringConverter<>() {
+            @Override
+            public String toString(Number value) {
+                return Formats.money(BigDecimal.valueOf(value.doubleValue()));
+            }
+
+            @Override
+            public Number fromString(String text) {
+                return Formats.parseMoney(text);
+            }
+        });
+        trendChart.setVisible(false);
+        StackPane content = new StackPane(previewTable, trendChart);
+        VBox.setVgrow(content, Priority.ALWAYS);
+        ToggleGroup viewToggle = new ToggleGroup();
+        tableView.setToggleGroup(viewToggle);
+        chartView.setToggleGroup(viewToggle);
+        tableView.setTooltip(new Tooltip("Buchungen tabellarisch anzeigen"));
+        chartView.setTooltip(new Tooltip("Verlauf der Gesamtsumme über die Monate als Diagramm anzeigen"));
+        tableView.setSelected(true);
+        viewToggle.selectedToggleProperty().addListener((observable, before, selected) -> {
+            if (selected == null) {
+                viewToggle.selectToggle(before);
+                return;
+            }
+            previewTable.setVisible(selected == tableView);
+            trendChart.setVisible(selected == chartView);
+            updateTrendChart();
+        });
+        HBox header = new HBox(8, heading("Vorschau (nur Buchungstage)"), spacer(), tableView, chartView);
+        header.setAlignment(Pos.CENTER_LEFT);
         banner.getStyleClass().add("banner");
         banner.setMaxWidth(Double.MAX_VALUE);
         banner.setWrapText(true);
         summary.getStyleClass().add("summary");
         summary.setWrapText(true);
-        VBox pane = new VBox(8, heading("Vorschau (nur Buchungstage)"), banner, summary, previewTable);
+        VBox pane = new VBox(8, header, banner, summary, content);
         pane.setPadding(new Insets(10));
         return pane;
     }
@@ -391,6 +442,7 @@ final class MainView extends BorderPane {
             previewPlan = null;
             previewResult = null;
             previewTable.getItems().clear();
+            trendChart.getData().clear();
             previewTable.setPlaceholder(new Label(Dialogs.message(exception)));
             showBanner("banner-info", "ℹ " + Dialogs.message(exception));
             summary.setText("");
@@ -402,6 +454,7 @@ final class MainView extends BorderPane {
         scaleMaximum = ColorScale.maximum(previewResult, scaleLimit);
         previewTable.getItems().setAll(previewResult.rows());
         previewTable.refresh();
+        updateTrendChart();
         exportXlsx.setDisable(false);
         exportOds.setDisable(false);
 
@@ -427,6 +480,44 @@ final class MainView extends BorderPane {
             showBanner("banner-ok", "✔ Der Kontostand bleibt im gesamten Zeitraum oberhalb der Untergrenze von "
                     + Formats.money(scaleLimit) + ".");
         }
+    }
+
+    /** Only the visible chart is rebuilt, as long plans produce many points. */
+    private void updateTrendChart() {
+        if (!trendChart.isVisible()) {
+            return;
+        }
+        trendChart.getData().clear();
+        if (previewPlan == null || previewResult == null) {
+            return;
+        }
+        LocalDate start = previewPlan.startDate();
+        double from = TrendSeries.position(start, start);
+        double to = TrendSeries.endPosition(start, previewPlan.endDate());
+        trendMonths.setLowerBound(from);
+        trendMonths.setUpperBound(to);
+        trendMonths.setTickUnit(TrendSeries.tickUnit(to - from));
+        trendMonths.setTickLabelFormatter(new StringConverter<>() {
+            @Override
+            public String toString(Number value) {
+                return TrendSeries.label(start, value.doubleValue());
+            }
+
+            @Override
+            public Number fromString(String text) {
+                throw new UnsupportedOperationException();
+            }
+        });
+        XYChart.Series<Number, Number> balance = new XYChart.Series<>();
+        balance.setName("Gesamtsumme");
+        for (TrendSeries.Point point : TrendSeries.steps(previewResult, start, previewPlan.endDate())) {
+            balance.getData().add(new XYChart.Data<>(point.month(), point.balance()));
+        }
+        XYChart.Series<Number, Number> limit = new XYChart.Series<>();
+        limit.setName("Untergrenze " + Formats.money(scaleLimit));
+        limit.getData().add(new XYChart.Data<>(from, scaleLimit));
+        limit.getData().add(new XYChart.Data<>(to, scaleLimit));
+        trendChart.getData().setAll(List.of(balance, limit));
     }
 
     private boolean limitValid() {

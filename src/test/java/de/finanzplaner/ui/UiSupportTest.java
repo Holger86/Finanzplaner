@@ -28,6 +28,10 @@ class UiSupportTest {
                 RecurrenceText.describe(new Recurrence.MonthlyBusinessDay(START, null, BusinessDay.LAST)));
         assertEquals("erster Werktag im Monat ab 31.01.2026",
                 RecurrenceText.describe(new Recurrence.MonthlyBusinessDay(START, null, BusinessDay.FIRST)));
+        assertEquals("jährlich ab 31.01.2026",
+                RecurrenceText.describe(new Recurrence.Interval(START, null, 1, IntervalUnit.JAHR)));
+        assertEquals("alle 2 Jahre ab 31.01.2026",
+                RecurrenceText.describe(new Recurrence.Interval(START, null, 2, IntervalUnit.JAHR)));
         assertEquals("Tage", RecurrenceText.unit(IntervalUnit.TAG, 3));
     }
 

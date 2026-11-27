@@ -89,6 +89,7 @@ public final class SimulationEngine {
                 case WOCHE -> dayIntervals(interval.startDate(), first, last, 7L * interval.every(), add);
                 case MONAT -> monthIntervals(interval.startDate(), first, last, interval.every(), add);
                 case QUARTAL -> monthIntervals(interval.startDate(), first, last, 3L * interval.every(), add);
+                case JAHR -> monthIntervals(interval.startDate(), first, last, 12L * interval.every(), add);
             }
         } else if (recurrence instanceof Recurrence.MonthlyBusinessDay monthly) {
             LocalDate first = later(from, monthly.startDate());
