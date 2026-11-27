@@ -147,7 +147,7 @@
                                     <executable>${java.home}/bin/jlink</executable>
                                     <arguments>
                                         <argument>--module-path</argument><argument>${java.home}/jmods;${project.build.directory}/javafx-modules</argument>
-                                        <argument>--add-modules</argument><argument>javafx.controls,java.sql,java.sql.rowset,java.xml,java.desktop,java.naming,java.management,java.net.http,java.scripting,java.instrument,java.security.jgss,jdk.crypto.ec,jdk.unsupported</argument>
+                                        <argument>--add-modules</argument><argument>javafx.controls,java.sql,java.sql.rowset,java.xml,java.desktop,java.naming,java.management,java.net.http,java.scripting,java.instrument,java.security.jgss,jdk.unsupported</argument>
                                         <argument>--strip-debug</argument><argument>--no-header-files</argument><argument>--no-man-pages</argument>
                                         <argument>--output</argument><argument>${project.build.directory}/runtime</argument>
                                     </arguments>
