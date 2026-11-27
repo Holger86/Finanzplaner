@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="1-create-financial-plans" author="finanzplaner">
+        <sql>
+            CREATE TABLE financial_plan (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT NOT NULL,
+                overdraft_limit TEXT NOT NULL
+            );
+            CREATE TABLE account (
+                plan_id INTEGER NOT NULL REFERENCES financial_plan(id) ON DELETE CASCADE,
+                position INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                opening_balance TEXT NOT NULL,
+                PRIMARY KEY (plan_id, position)
+            );
+            CREATE TABLE entry (
+                plan_id INTEGER NOT NULL REFERENCES financial_plan(id) ON DELETE CASCADE,
+                position INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                amount TEXT NOT NULL,
+                recurrence_kind TEXT NOT NULL,
+                start_date TEXT NOT NULL,
+                end_date TEXT,
+                interval_every INTEGER,
+                interval_unit TEXT,
+                business_day TEXT,
+                settled INTEGER,
+                excluded_through TEXT,
+                PRIMARY KEY (plan_id, position)
+            );
+        </sql>
+    </changeSet>
+</databaseChangeLog>
