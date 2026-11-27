@@ -208,7 +208,7 @@ public final class OdsExportService {
             } else if (c == '\t' || c == '\n' || c == '\r') {
                 start(xml, "text", c == '\t' ? "tab" : "line-break", TEXT);
                 xml.writeEndElement();
-                i++;
+                i += c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n' ? 2 : 1;
             } else {
                 int end = i + 1;
                 while (end < text.length() && " \t\n\r".indexOf(text.charAt(end)) < 0) {
