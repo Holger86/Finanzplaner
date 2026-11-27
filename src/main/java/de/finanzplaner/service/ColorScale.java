@@ -9,6 +9,22 @@ import java.util.Objects;
  * If maximum is not above limit, the scale is red at the limit and green above it.
  */
 public final class ColorScale {
+    /**
+     * Upper end of the scale for a simulation: the highest balance, but at least
+     * one euro above the limit so that the scale never degenerates.
+     */
+    public static BigDecimal maximum(SimulationResult result, BigDecimal limit) {
+        Objects.requireNonNull(result, "result");
+        Objects.requireNonNull(limit, "limit");
+        BigDecimal maximum = limit;
+        for (SimulationRow row : result.rows()) {
+            if (row.balance().compareTo(maximum) > 0) {
+                maximum = row.balance();
+            }
+        }
+        return maximum.compareTo(limit) > 0 ? maximum : limit.add(BigDecimal.ONE);
+    }
+
     public static RgbColor color(BigDecimal value, BigDecimal limit, BigDecimal maximum) {
         Objects.requireNonNull(value, "value");
         Objects.requireNonNull(limit, "limit");

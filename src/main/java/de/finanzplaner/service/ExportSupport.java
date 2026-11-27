@@ -13,19 +13,15 @@ final class ExportSupport {
     }
 
     static BigDecimal maximum(SimulationResult result, BigDecimal limit) {
-        BigDecimal maximum = limit;
         for (SimulationRow row : result.rows()) {
             Objects.requireNonNull(row, "row");
             Objects.requireNonNull(row.date(), "date");
             Objects.requireNonNull(row.description(), "description");
             Objects.requireNonNull(row.amount(), "amount");
-            BigDecimal balance = Objects.requireNonNull(row.balance(), "balance");
+            Objects.requireNonNull(row.balance(), "balance");
             validateXmlText(row.description());
-            if (balance.compareTo(maximum) > 0) {
-                maximum = balance;
-            }
         }
-        return maximum.compareTo(limit) > 0 ? maximum : limit.add(BigDecimal.ONE);
+        return ColorScale.maximum(result, limit);
     }
 
     static void validateXmlText(String text) {

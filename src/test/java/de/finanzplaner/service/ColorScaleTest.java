@@ -3,6 +3,9 @@ package de.finanzplaner.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class ColorScaleTest {
@@ -30,5 +33,19 @@ class ColorScaleTest {
         assertThrows(NullPointerException.class, () -> ColorScale.color(b("0"), b("0"), null));
         assertThrows(IllegalArgumentException.class, () -> new RgbColor(-1, 0, 0));
         assertThrows(IllegalArgumentException.class, () -> new RgbColor(0, 256, 0));
+    }
+
+    @Test
+    void maximumUsesHighestBalanceOrOneAboveLimit() {
+        var day = LocalDate.of(2026, 1, 1);
+        var rising = new SimulationResult(List.of(
+                new SimulationRow(day, "a", b("5"), b("5"), true),
+                new SimulationRow(day, "b", b("20"), b("25"), false),
+                new SimulationRow(day, "c", b("-30"), b("-5"), false)), Optional.empty());
+        assertEquals(b("25"), ColorScale.maximum(rising, b("-10")));
+        var low = new SimulationResult(List.of(new SimulationRow(day, "a", b("-50"), b("-50"), true)), Optional.empty());
+        assertEquals(b("-9"), ColorScale.maximum(low, b("-10")));
+        assertThrows(NullPointerException.class, () -> ColorScale.maximum(null, b("0")));
+        assertThrows(NullPointerException.class, () -> ColorScale.maximum(rising, null));
     }
 }

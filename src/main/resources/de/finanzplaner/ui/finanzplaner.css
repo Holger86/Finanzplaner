@@ -1,0 +1,105 @@
+.root {
+    -fx-font-family: "Segoe UI", "System";
+    -fx-font-size: 13px;
+}
+
+.parameter-bar {
+    -fx-padding: 8 10 8 10;
+    -fx-background-color: #f4f6f8;
+    -fx-border-color: transparent transparent #d0d4d9 transparent;
+}
+
+.section-heading {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2b3a4a;
+}
+
+.capital {
+    -fx-font-weight: bold;
+}
+
+.summary {
+    -fx-text-fill: #44505c;
+}
+
+.banner {
+    -fx-padding: 10 12 10 12;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-font-weight: bold;
+}
+
+.banner-warning {
+    -fx-background-color: #b00020;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.banner-ok {
+    -fx-background-color: #e3f4e1;
+    -fx-border-color: #7cbf72;
+    -fx-text-fill: #1e5a17;
+}
+
+.banner-info {
+    -fx-background-color: #fff6d6;
+    -fx-border-color: #e0c060;
+    -fx-text-fill: #5a4600;
+}
+
+.money-column, .money-cell {
+    -fx-alignment: CENTER-RIGHT;
+}
+
+.money-cell.negative {
+    -fx-text-fill: #b00020;
+}
+
+.money-cell.positive {
+    -fx-text-fill: #1e6a17;
+}
+
+.table-row-cell.income-row .table-cell {
+    -fx-text-fill: #1e6a17;
+}
+
+.table-row-cell.income-row:selected .table-cell,
+.table-row-cell.expense-row:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+.text-field.invalid {
+    -fx-border-color: #b00020;
+    -fx-border-width: 2;
+}
+
+.form-grid {
+    -fx-hgap: 10;
+    -fx-vgap: 8;
+}
+
+.form-error {
+    -fx-text-fill: #b00020;
+    -fx-font-weight: bold;
+}
+
+.hint {
+    -fx-text-fill: #5c6670;
+}
+
+.estimate {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.request {
+    -fx-text-fill: #8a3b00;
+    -fx-font-weight: bold;
+}
+
+.status-bar {
+    -fx-padding: 4 10 4 10;
+    -fx-background-color: #eceff2;
+    -fx-border-color: #d0d4d9 transparent transparent transparent;
+}
