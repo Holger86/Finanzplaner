@@ -13,13 +13,16 @@ und Simulation tabellarischer Liquiditätspläne.
 * **Kontenverwaltung:** Beliebig viele Konten mit Startsaldo; das Startkapital
   ist die Summe aller Konten.
 * **Posten-Editor:** Einnahme/Ausgabe, Betrag und Wiederholungsregel
-  (einmalig, Intervall alle N Tage/Wochen/Monate/Quartale, erster oder letzter
+  (einmalig, Intervall alle N Tage/Wochen/Monate/Quartale/Jahre, erster oder letzter
   Werktag des Monats) mit dynamischen Feldern und Vorschau der nächsten Termine.
   Die Reihenfolge von Posten am selben Tag ist per ▲/▼ steuerbar.
 * **Live-Vorschau:** Tabelle `Datum | Was | Betrag | Neue Gesamtsumme` mit
   Heatmap-Färbung (Grün → Gelb → Rot, tiefrot unterhalb der Untergrenze),
   identisch zu den Exporten. Ein Warnbanner nennt das erste Datum unter der
   Untergrenze sowie den niedrigsten Stand.
+* **Trenddiagramm:** Umschaltbar zwischen Tabelle und Diagramm. Das Diagramm
+  zeigt den Verlauf der Gesamtsumme über die Monate (horizontal) in Euro
+  (vertikal) samt gestrichelter Untergrenze.
 * **Fortschreiben:** Schätzt den heutigen Kontostand aus dem gewählten Plan,
   verlangt die Eingabe/Bestätigung der realen Kontostände, übernimmt
   regelmäßige Zahlungen ohne Doppelbuchung am Stichtag und entfernt
