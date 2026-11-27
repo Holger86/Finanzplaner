@@ -70,12 +70,16 @@ class SimulationEngineTest {
         var entries = List.of(
                 entry("yearly", EntryType.AUSGABE, "1", new Recurrence.Interval(d(2023, 3, 15), null, 1, IntervalUnit.JAHR)),
                 entry("leap", EntryType.AUSGABE, "1", new Recurrence.Interval(d(2024, 2, 29), null, 1, IntervalUnit.JAHR)),
-                entry("biennial", EntryType.AUSGABE, "1", new Recurrence.Interval(d(2024, 7, 1), null, 2, IntervalUnit.JAHR)));
+                entry("biennial", EntryType.AUSGABE, "1", new Recurrence.Interval(d(2024, 7, 1), null, 2, IntervalUnit.JAHR)),
+                entry("february", EntryType.AUSGABE, "1", new Recurrence.Interval(d(2023, 2, 28), null, 1, IntervalUnit.JAHR)),
+                entry("yearEnd", EntryType.AUSGABE, "1", new Recurrence.Interval(d(2024, 12, 31), null, 1, IntervalUnit.JAHR)));
         var result = SimulationEngine.simulate(new FinancialPlan("p", d(2024, 1, 1), d(2028, 12, 31), BigDecimal.ZERO,
                 List.of(new Account("a", BigDecimal.ZERO)), entries));
         assertEquals(List.of(d(2024, 3, 15), d(2025, 3, 15), d(2026, 3, 15), d(2027, 3, 15), d(2028, 3, 15)), dates(result, "yearly"));
         assertEquals(List.of(d(2024, 2, 29), d(2025, 2, 28), d(2026, 2, 28), d(2027, 2, 28), d(2028, 2, 29)), dates(result, "leap"));
         assertEquals(List.of(d(2024, 7, 1), d(2026, 7, 1), d(2028, 7, 1)), dates(result, "biennial"));
+        assertEquals(List.of(d(2024, 2, 28), d(2025, 2, 28), d(2026, 2, 28), d(2027, 2, 28), d(2028, 2, 28)), dates(result, "february"));
+        assertEquals(List.of(d(2024, 12, 31), d(2025, 12, 31), d(2026, 12, 31), d(2027, 12, 31), d(2028, 12, 31)), dates(result, "yearEnd"));
     }
 
     @Test
