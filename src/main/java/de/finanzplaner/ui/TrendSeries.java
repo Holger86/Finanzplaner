@@ -39,7 +39,9 @@ public final class TrendSeries {
 
     /** Position right after the inclusive plan end, i.e. the right edge of the chart. */
     public static double endPosition(LocalDate origin, LocalDate end) {
-        return position(origin, end.plusDays(1));
+        Objects.requireNonNull(origin, "origin");
+        Objects.requireNonNull(end, "end");
+        return monthNumber(end) - monthNumber(origin) + end.getDayOfMonth() / (double) end.lengthOfMonth();
     }
 
     /**
@@ -85,8 +87,11 @@ public final class TrendSeries {
     public static String label(LocalDate origin, double position) {
         Objects.requireNonNull(origin, "origin");
         long month = (long) Math.floor(position);
-        YearMonth yearMonth = YearMonth.from(origin).plusMonths(month);
         double fraction = position - month;
+        if (month == monthNumber(LocalDate.MAX) - monthNumber(origin) + 1 && fraction < 1e-9) {
+            return "01/+1000000000";
+        }
+        YearMonth yearMonth = YearMonth.from(origin).plusMonths(month);
         if (fraction < 1e-9) {
             return MONTH.format(yearMonth);
         }

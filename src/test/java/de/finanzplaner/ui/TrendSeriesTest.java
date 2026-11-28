@@ -20,6 +20,8 @@ class TrendSeriesTest {
         assertEquals(1.5, TrendSeries.position(START, LocalDate.of(2026, 2, 15)));
         assertEquals(-1.0, TrendSeries.position(START, LocalDate.of(2025, 12, 1)));
         assertEquals(12.0, TrendSeries.endPosition(START, LocalDate.of(2026, 12, 31)));
+        assertEquals(1 + 15.0 / 28, TrendSeries.endPosition(START, LocalDate.of(2026, 2, 15)));
+        assertEquals(2.0, TrendSeries.endPosition(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 2, 29)));
         assertEquals(14.0 / 31, TrendSeries.position(LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 15)));
     }
 
@@ -50,6 +52,25 @@ class TrendSeriesTest {
         assertEquals("01/2026", TrendSeries.label(START, 0));
         assertEquals("03/2027", TrendSeries.label(START, 14));
         assertEquals("15.02.2026", TrendSeries.label(START, 1.5));
+    }
+
+    @Test
+    void handlesMaximumEndDate() {
+        LocalDate start = LocalDate.MAX.minusDays(2);
+        var result = new SimulationResult(List.of(
+                row(start, "Anfangsbestand", "100", "100", true),
+                row(LocalDate.MAX, "Gehalt", "50", "150", false)), Optional.empty());
+
+        assertEquals(1.0, TrendSeries.endPosition(start, LocalDate.MAX));
+        assertEquals("01/+1000000000", TrendSeries.label(start, TrendSeries.endPosition(start, LocalDate.MAX)));
+        assertEquals("12/+999999999", TrendSeries.label(start, 0));
+        assertEquals("31.12.+999999999", TrendSeries.label(start, TrendSeries.position(start, LocalDate.MAX)));
+        assertEquals(List.of(
+                new TrendSeries.Point(28.0 / 31, new BigDecimal("100")),
+                new TrendSeries.Point(30.0 / 31, new BigDecimal("100")),
+                new TrendSeries.Point(30.0 / 31, new BigDecimal("150")),
+                new TrendSeries.Point(1.0, new BigDecimal("150"))),
+                TrendSeries.steps(result, start, LocalDate.MAX));
     }
 
     private static SimulationRow row(LocalDate date, String text, String amount, String balance, boolean opening) {
