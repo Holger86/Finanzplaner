@@ -15,6 +15,7 @@
         <maven.compiler.release>25</maven.compiler.release>
         <javafx.version>25.0.2</javafx.version>
         <junit.version>5.13.4</junit.version>
+        <app.version>1.0.0</app.version>
     </properties>
 
     <dependencies>
@@ -175,7 +176,7 @@
                                     <arguments>
                                         <argument>--type</argument><argument>exe</argument>
                                         <argument>--name</argument><argument>Finanzplaner</argument>
-                                        <argument>--app-version</argument><argument>1.0.0</argument>
+                                        <argument>--app-version</argument><argument>${app.version}</argument>
                                         <argument>--input</argument><argument>${project.build.directory}/installer-input</argument>
                                         <argument>--main-jar</argument><argument>${project.build.finalName}.jar</argument>
                                         <argument>--main-class</argument><argument>de.finanzplaner.ui.FinanzplanerLauncher</argument>
