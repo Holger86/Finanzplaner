@@ -1,5 +1,7 @@
 # Finanzplaner
 
+[![CI](https://github.com/Holger86/Finanzplaner/actions/workflows/ci.yml/badge.svg)](https://github.com/Holger86/Finanzplaner/actions/workflows/ci.yml)
+
 Windows-Desktop-Anwendung (Java 25, JavaFX, SQLite/Liquibase) zur Erstellung
 und Simulation tabellarischer Liquiditätspläne.
 
@@ -58,7 +60,15 @@ mvn clean package -Pwindows-package
 ```
 
 Ergebnis: `target/dist/Finanzplaner-1.0.0.exe` (mit Startmenüeintrag und
-Desktop-Verknüpfung).
+Desktop-Verknüpfung). Die Installer-Version ist `${app.version}` (Standard
+`1.0.0`). Eine andere Version, zum Beispiel für ein Release:
+
+```shell
+mvn clean package -Pwindows-package -Dapp.version=1.2.3
+```
+
+`jpackage` akzeptiert nur 1–4 numerische Komponenten (`1.2.3`), keine Suffixe
+wie `-SNAPSHOT`.
 
 `jlink` erzeugt eine reduzierte Runtime mit den Modulen `javafx.controls`,
 `java.sql`, `java.sql.rowset`, `java.xml`, `java.desktop`, `java.naming`,
@@ -69,3 +79,30 @@ Die übrigen Bibliotheken einschließlich SQLite-Natives und
 Liquibase-Ressourcen liegen auf dem Klassenpfad der Anwendung, da Liquibase
 ein automatisches Modul ist und nicht direkt mit `jlink` gelinkt werden kann.
 JavaFX wird ausschließlich aus der Runtime geladen.
+
+## GitHub-Pipelines
+
+Jeder Pull Request und jeder Push auf `main` startet den Workflow **CI**.
+Der Check heißt `Build and test` und führt `mvn verify` mit JDK 25 aus.
+Damit ein Pull Request erst nach grünem Check gemergt werden kann, unter
+*Settings → Rules → Rulesets* (oder *Branches*) für `main` den Statuscheck
+`CI / Build and test` als erforderlich markieren.
+
+Ein Windows-Installer lässt sich in der GitHub-Oberfläche erzeugen. Die EXE
+wird angehängt, sobald der Workflow **Release** durchgelaufen ist. Der
+Installer ist nicht codesigniert.
+
+* **Release anlegen:** *Releases → Draft a new release*, Tag `vX.Y.Z`
+  (zum Beispiel `v1.2.3`) veröffentlichen. Der Workflow baut genau diesen
+  Tag und hängt `Finanzplaner-X.Y.Z.exe` an das Release.
+* **Oder über Actions:** *Actions → Release → Run workflow*, Branch wählen
+  und die Version `1.2.3` angeben. Es entsteht das Release `v1.2.3`
+  inklusive EXE.
+
+Der Workflow **Release** muss auf `main` liegen. Actions-Läufe bauen den
+gewählten Branch; veröffentlichte Releases bauen den angegebenen Tag. Der
+Commit muss diese Pipeline bereits enthalten.
+
+Die Versionsnummer muss 1–4 numerische Komponenten haben, optional mit
+führendem `v`. Ein Entwurf allein startet den Build nicht; das Release muss
+veröffentlicht werden.
