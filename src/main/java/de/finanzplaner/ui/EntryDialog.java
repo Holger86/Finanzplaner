@@ -95,6 +95,7 @@ final class EntryDialog {
                     case WOCHE -> "Woche(n)";
                     case MONAT -> "Monat(e)";
                     case QUARTAL -> "Quartal(e)";
+                    case JAHR -> "Jahr(e)";
                 };
             }
 
@@ -174,7 +175,7 @@ final class EntryDialog {
                 ruleGrid.addRow(0, new Label("Alle:"), new HBox(8, every, unit));
                 ruleGrid.addRow(1, new Label("Ab (Startdatum):"), start);
                 ruleGrid.addRow(2, new Label("Bis (optional):"), withClear(end));
-                Label hint = new Label("Bei Monaten/Quartalen wird auf Monatsenden abgerundet,"
+                Label hint = new Label("Bei Monaten/Quartalen/Jahren wird auf Monatsenden abgerundet,"
                         + " z. B. 31.01. → 28./29.02. → 31.03.");
                 hint.getStyleClass().add("hint");
                 hint.setWrapText(true);

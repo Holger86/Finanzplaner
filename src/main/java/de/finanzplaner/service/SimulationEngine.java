@@ -87,8 +87,10 @@ public final class SimulationEngine {
             switch (interval.unit()) {
                 case TAG -> dayIntervals(interval.startDate(), first, last, interval.every(), add);
                 case WOCHE -> dayIntervals(interval.startDate(), first, last, 7L * interval.every(), add);
-                case MONAT -> monthIntervals(interval.startDate(), first, last, interval.every(), add);
-                case QUARTAL -> monthIntervals(interval.startDate(), first, last, 3L * interval.every(), add);
+                case MONAT -> monthIntervals(interval.startDate(), first, last, interval.every(), true, add);
+                case QUARTAL -> monthIntervals(interval.startDate(), first, last, 3L * interval.every(), true, add);
+                // Always the anchor's month, so 28.02. stays 28.02. and 29.02. falls back to 28.02.
+                case JAHR -> monthIntervals(interval.startDate(), first, last, 12L * interval.every(), false, add);
             }
         } else if (recurrence instanceof Recurrence.MonthlyBusinessDay monthly) {
             LocalDate first = later(from, monthly.startDate());
@@ -127,12 +129,12 @@ public final class SimulationEngine {
     }
 
     private static void monthIntervals(LocalDate anchor, LocalDate first, LocalDate last, long step,
-                                       Consumer<LocalDate> add) {
+                                       boolean keepMonthEnd, Consumer<LocalDate> add) {
         long startMonth = monthNumber(anchor);
         long offset = monthNumber(first) - startMonth;
         long index = (offset + step - 1) / step;
         long endMonth = monthNumber(last);
-        boolean endOfMonth = anchor.getDayOfMonth() == anchor.lengthOfMonth();
+        boolean endOfMonth = keepMonthEnd && anchor.getDayOfMonth() == anchor.lengthOfMonth();
         for (long month = startMonth + index * step; month <= endMonth; month += step) {
             YearMonth ym = yearMonth(month);
             LocalDate date = endOfMonth ? ym.atEndOfMonth()

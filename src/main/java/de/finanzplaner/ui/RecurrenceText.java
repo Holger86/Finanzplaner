@@ -31,6 +31,7 @@ public final class RecurrenceText {
             case WOCHE -> one ? "Woche" : "Wochen";
             case MONAT -> one ? "Monat" : "Monate";
             case QUARTAL -> one ? "Quartal" : "Quartale";
+            case JAHR -> one ? "Jahr" : "Jahre";
         };
     }
 
@@ -41,6 +42,7 @@ public final class RecurrenceText {
                 case WOCHE -> "wöchentlich";
                 case MONAT -> "monatlich";
                 case QUARTAL -> "vierteljährlich";
+                case JAHR -> "jährlich";
             };
         }
         return "alle " + every + " " + unit(unit, every);
